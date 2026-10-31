@@ -1,7 +1,7 @@
 // Stolen from: https://developers.cloudflare.com/workers/examples/cors-header-proxy/
 
 // Modifications:
-// - Only allow requests from '*.luludodo.de' and 'localhost'
+// - Accept requests from '*.luludodo.de' and 'localhost'
 // - Removed default api url
 // - Reformatted to match my coding style
 
@@ -17,17 +17,21 @@ export default {
         }
 
         let origin = 'https://luludodo.de'
-        if ((
-            url.hostname === 'luludodo.de' ||
-            url.hostname.endsWith('.luludodo.de') ||
-            url.hostname === 'localhost' ||
-            url.hostname === '127.0.0.1' ||
-            url.hostname === '::1'
-        ) && (
-            url.protocol === 'https:' ||
-            url.protocol === 'http:'
-        )) {
-            origin = url.origin
+        const requestOrigin = request.headers.get('Origin')
+        if (requestOrigin) {
+            const requestUrl = new URL(requestOrigin)
+            if ((
+                requestUrl.hostname === 'luludodo.de' ||
+                requestUrl.hostname.endsWith('.luludodo.de') ||
+                requestUrl.hostname === 'localhost' ||
+                requestUrl.hostname === '127.0.0.1' ||
+                requestUrl.hostname === '::1'
+            ) && (
+                requestUrl.protocol === 'https:' ||
+                requestUrl.protocol === 'http:'
+            )) {
+                origin = requestUrl.origin
+            }
         }
 
         const corsHeaders = {
@@ -84,7 +88,7 @@ export default {
                 // Handle standard OPTIONS request.
                 return new Response(null, {
                     headers: {
-                        Allow: "GET, HEAD, POST, OPTIONS",
+                        Allow: 'GET, HEAD, POST, OPTIONS',
                     },
                 })
             }
