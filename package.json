@@ -1,5 +1,5 @@
 {
-  "name": "curseforge-api-relay",
+  "name": "cors-relay",
   "version": "0.0.0",
   "private": true,
   "scripts": {

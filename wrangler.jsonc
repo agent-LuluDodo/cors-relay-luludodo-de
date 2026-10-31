@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "curseforge-api-relay",
+	"name": "cors-relay",
 	"main": "src/index.ts",
 	"compatibility_date": "2026-10-23",
 	"observability": {
