@@ -1,7 +1,7 @@
 // Stolen from: https://developers.cloudflare.com/workers/examples/cors-header-proxy/
 
 // Modifications:
-// - Only allow requests from 'luludodo.de'
+// - Only allow requests from '*.luludodo.de' and 'localhost'
 // - Removed default api url
 // - Reformatted to match my coding style
 
@@ -16,10 +16,25 @@ export default {
             })
         }
 
+        let origin = 'https://luludodo.de'
+        if ((
+            url.hostname === 'luludodo.de' ||
+            url.hostname.endsWith('.luludodo.de') ||
+            url.hostname === 'localhost' ||
+            url.hostname === '127.0.0.1' ||
+            url.hostname === '::1'
+        ) && (
+            url.protocol === 'https:' ||
+            url.protocol === 'http:'
+        )) {
+            origin = url.origin
+        }
+
         const corsHeaders = {
-            'Access-Control-Allow-Origin': 'luludodo.de',
+            'Access-Control-Allow-Origin': origin,
             'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
             'Access-Control-Max-Age': '86400',
+            'Vary': 'Origin',
         }
 
         async function handleRequest(url: URL, request: Request) {
@@ -42,11 +57,10 @@ export default {
             response = new Response(response.body, response)
 
             // Set CORS headers
-            response.headers.set('Access-Control-Allow-Origin', 'luludodo.de')
-            //response.headers.set('Access-Control-Allow-Origin', url.origin)
+            response.headers.set('Access-Control-Allow-Origin', origin)
 
             // Append to/Add Vary header so browser will cache response correctly
-            //response.headers.append('Vary', 'Origin')
+            response.headers.append('Vary', 'Origin')
 
             return response
         }
